@@ -10,7 +10,7 @@ load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
 db = None
-https://github.com/ZentroThread/RAG_ChatBot.git
+
 def connectDatabase():
     global db
     mysql_uri = f"mysql+mysqlconnector://root:@localhost:3306/ragmysqldb"
