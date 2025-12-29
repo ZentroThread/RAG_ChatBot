@@ -27,11 +27,29 @@ llm = ChatOpenAI(
     api_key=api_key
 )
 
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+def format_chat_history():
+    history = ""
+    for msg in st.session_state.chat_history:
+        history += f"{msg['role']}: {msg['content']}\n"
+    return history
+
 def getQueryFromLLM(question):
     template = """
     Below is the schema of MYSQL database, read the schema carefully and answer user's question in the form of SQL query.
 
     {schema}
+    
+    Chat History:
+    {chat_history}
+
+    Write a syntactically correct MySQL query for the user's latest question.
+    Rules:
+    - Use only schema tables and columns
+    - Return ONLY the SQL query
+    - No explanations
 
     question: {question}
     SQL query:
@@ -44,9 +62,10 @@ def getQueryFromLLM(question):
 
     response = chain.invoke({
         "question": question,
+        "chat_history": format_chat_history(),
         "schema": getDatabaseSchema()
     })
-    return response.content
+    return response.content.strip()
 
 def getResponseForQueryResult(question, query, result):
     template2 = """
@@ -61,6 +80,9 @@ def getResponseForQueryResult(question, query, result):
     Response: There are brands in the database
     
     Now your turn to write response in natural language from the given result : 
+    
+    Chat History:
+    {chat_history}
 
     question: {question}
     SQL query: {query}
@@ -74,11 +96,12 @@ def getResponseForQueryResult(question, query, result):
 
     response = chain2.invoke({
         "question": question,
+        "chat_history": format_chat_history(),
         "schema": getDatabaseSchema(),
         "query": query,
         "result": result
     })
-    return response.content
+    return response.content.strip()
 
 connectDatabase()
 
@@ -92,18 +115,39 @@ connectDatabase()
 # print(getDatabaseSchema())
 
 st.set_page_config(
+    page_title="Chat with MySQL DB",
     page_icon="🤖",
-    page_title="Chat with MYSQL DB",
-    layout= "centered"
+    layout="centered"
 )
 
-question = st.chat_input('Chat with the Mysql Database')
+# Show previous messages
+for msg in st.session_state.chat_history:
+    st.chat_message(msg["role"]).markdown(msg["content"])
+
+question = st.chat_input("Chat with the MySQL Database")
 
 if question:
-    st.chat_message('user').markdown(question)
-    query = getQueryFromLLM(question)
-    result = runQuery(query)
-    response = getResponseForQueryResult(question, query, result)
-    st.chat_message('assistant').markdown(response)
+    # Store user message
+    st.session_state.chat_history.append({
+        "role": "user",
+        "content": question
+    })
+    st.chat_message("user").markdown(question)
+
+    try:
+        query = getQueryFromLLM(question)
+        result = runQuery(query)
+        response = getResponseForQueryResult(question, query, result)
+
+        # Store assistant response
+        st.session_state.chat_history.append({
+            "role": "assistant",
+            "content": response
+        })
+
+        st.chat_message("assistant").markdown(response)
+
+    except Exception as e:
+        st.error(f"Error: {e}")
 
 
