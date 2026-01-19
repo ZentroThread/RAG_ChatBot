@@ -163,7 +163,8 @@ st.title("Textile RAG Chatbot (Multi-table MySQL)")
 
 @st.cache_resource
 def init_vectorstore():
-    return create_vectorstore(*load_mysql_data())
+    df = load_mysql_data()
+    return create_vectorstore(df)
 
 vector_store = init_vectorstore()
 

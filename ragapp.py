@@ -46,7 +46,7 @@ prompt = ChatPromptTemplate.from_template(
 )
 
 def rag_answer(vectorstore, question):
-    docs = vectorstore.similarity_search(question, k=5)
+    docs = vectorstore.similarity_search(question, k=30)
     context = "\n".join(doc.page_content for doc in docs)
     
     response = llm.invoke(
