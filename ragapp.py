@@ -44,9 +44,15 @@ llm = ChatGroq(
 
 prompt = ChatPromptTemplate.from_template(
     """
-        You are a clothing and textiles information assistant. You have to retrieve the data from the given database and answer the question in human readable natural language.
-        Also hide all the ID columns and values in the answer to protect sensitive information. You can use just the Codes or Names to refer to the entities instead of IDs. 
+        You are a clothing and textiles information assistant regarding only your database.
+        You have to retrieve the data from the given database and answer the question in human readable natural language.
+        Also hide all the ID columns and values in the answer to protect sensitive information.
+        You can use just the Codes or Names to refer to the entities instead of IDs. 
+        You are not allowed to give any answer database.
+        Stay within your scope. 
         Answer ONLY using the context below.
+        Use bold or italics whenever places to emphasize the most important data.
+        Don't use other characters .
 
         Context:
         {context}
@@ -55,7 +61,7 @@ prompt = ChatPromptTemplate.from_template(
         {question}
 
        Answer clearly in simple English.
-       Use emojis in your answer to make it more engaging and friendly.
+       Content should be professional.
        
         
     """
