@@ -1,2 +1,12 @@
-.env
-.venv
+# IDEs
+.idea/
+.vscode/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Java
+target/
+*.log
