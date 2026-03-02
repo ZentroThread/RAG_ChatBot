@@ -163,14 +163,27 @@ st.title("Textile RAG Chatbot (Multi-table MySQL)")
 
 @st.cache_resource
 def init_vectorstore():
-    df = load_mysql_data()
-    return create_vectorstore(df)
+    try:
+        df = load_mysql_data()
+        st.success(f"✅ Database connected successfully! Loaded {len(df)} records.")
+        return create_vectorstore(df)
+    except Exception as e:
+        st.error(f"Error initializing: {str(e)}")
+        return None
 
-vector_store = init_vectorstore()
+try:
+    vector_store = init_vectorstore()
+except Exception as e:
+    st.warning(f"⚠️ Vector store initialization failed: {str(e)}")
+    st.info("You can still test the database connection above.")
+    vector_store = None
 
 question = st.text_input("Ask anything......")
 
 if st.button("Ask"):
     if question.strip():
-        answer = rag_answer(vector_store, question)
-        st.success(answer)
+        if vector_store is None:
+            st.error("❌ Vector store not initialized. Please fix the OpenAI API key first.")
+        else:
+            answer = rag_answer(vector_store, question)
+            st.success(answer)
