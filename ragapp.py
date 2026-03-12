@@ -56,8 +56,9 @@ prompt = ChatPromptTemplate.from_template(
 
     STRICT CONSTRAINTS:
     - Only answer based on the provided Context. 
-    - If the answer is not in the Context, professionally state that you do not have that information.
-
+    - If the answer is not in the Context, professionally state that "Sorry,I do not have that information. I am just a Bridal Shop assistant.".
+    - Do not provide any thing rather than your database or regarding the shop.
+    
     Context:
     {context}
 
