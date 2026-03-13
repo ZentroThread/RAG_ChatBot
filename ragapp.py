@@ -72,8 +72,11 @@ def rag_answer(vectorstore, question, role):
 
     elif role == "CASHIER":
         restricted_tables = ["attire", "attire_rent"]
+    
+    elif role == "SALES_ASSISTANT":
+        restricted_tables = ["attire", "category"]
 
-    elif role == "ADMIN":
+    elif role == "OWNER":
         restricted_tables = None 
 
     else:
@@ -102,13 +105,14 @@ def rag_answer(vectorstore, question, role):
 
     role_instruction = ""
 
-    if role == "ADMIN":
+    if role == "OWNER":
         role_instruction = "You can access all information."
     elif role == "CASHIER":
         role_instruction = "Only answer questions about attire, attire_rent, and billing."
     elif role == "CUSTOMER":
         role_instruction = "Only answer about attire, availability, price, and attire category."
-
+    elif role == "SALES_ASSISTANT":
+        role_instruction = "Only answer about attire, category, and inventory."
     print("Sending request to LLM...")
 
     response = llm.invoke(
